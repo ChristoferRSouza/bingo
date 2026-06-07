@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Bingo com Letras Customizadas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1400px;
+            margin-bottom: 20px;
+        }
+
+        .title-area h1 { color: #e94560; margin: 0; }
+        .title-area p { margin: 5px 0 0 0; color: #8fa0a6; }
+
+        .btn-reset {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-reset:hover { background-color: #ff6b81; }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        /* --- Painel de Controle (Esquerda) --- */
+        .controls {
+            flex: 1;
+            background: #16213e;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 350px;
+        }
+
+        .mode-selector {
+            display: flex;
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            color: #8fa0a6;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .mode-btn.active { background: #e94560; color: white; }
+
+        .word-selector {
+            display: flex;
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #4f5d75;
+        }
+
+        .word-btn {
+            flex: 1;
+            background: transparent;
+            color: #8fa0a6;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .word-btn.active { background: #00f2fe; color: #000; }
+
+        .big-number-container {
+            background: #0f172a;
+            border: 2px solid #00f2fe;
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 15px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 140px;
+        }
+
+        .big-letter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e94560;
+            line-height: 1;
+        }
+
+        .big-number {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #00f2fe;
+            line-height: 1;
+        }
+
+        .current-sponsor-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            min-height: 160px;
+        }
+
+        #currentSponsorLogo {
+            max-width: 150px;
+            max-height: 100px;
+            border-radius: 8px;
+            object-fit: contain;
+            background: #fff;
+            padding: 5px;
+            border: 2px solid transparent;
+            display: none;
+        }
+        #currentSponsorLogo.active { display: block; border-color: #e94560; }
+
+        .sponsor-alert {
+            font-size: 1.3rem;
+            color: #4cd137;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .action-area {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .btn-draw {
+            background-color: #4cd137;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+        }
+        .btn-draw:hover { background-color: #63ff47; }
+
+        .manual-input-container { display: flex; gap: 10px; width: 100%; }
+
+        .input-number {
+            flex: 1;
+            background: #0f172a;
+            border: 2px solid #4f5d75;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+        }
+        .input-number:focus { border-color: #00f2fe; }
+
+        .btn-insert {
+            background-color: #00f2fe;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-insert:hover { background-color: #38f9ff; }
+
+        /* --- Painel Geral / Grade --- */
+        .bingo-board {
+            flex: 3;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            background: #16213e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .ball {
+            background: #0f172a;
+            border: 1px solid #4f5d75;
+            border-radius: 6px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .ball .ball-letter { font-size: 0.7rem; color: #00f2fe; z-index: 2; margin-bottom: -5px; }
+        .ball .ball-number { font-size: 1.3rem; z-index: 2; }
+
+        .sponsor-grid-logo {
+            max-width: 70%;
+            max-height: 35%;
+            object-fit: contain;
+            margin-bottom: 2px;
+            opacity: 0.15;
+            filter: grayscale(100%);
+            transition: 0.3s;
+        }
+
+        .ball .sponsor-name {
+            font-size: 0.5rem;
+            color: #8fa0a6;
+            text-align: center;
+            max-width: 95%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 2;
+        }
+
+        /* Estado após o sorteio */
+        .ball.drawn {
+            background: #4cd137;
+            color: #000;
+            border-color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(76, 209, 55, 0.7);
+            cursor: pointer;
+        }
+        .ball.drawn:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(76, 209, 55, 1); }
+        
+        .ball.drawn .sponsor-grid-logo { opacity: 1; filter: grayscale(0%); background: rgba(255,255,255,0.8); padding: 2px; border-radius: 4px; }
+        .ball.drawn .sponsor-name { color: #000000; font-weight: 800; }
+        .ball.drawn .ball-letter { color: #e94560; font-weight: 900; }
+
+        /* =========================================
+           MODAL DE TELA CHEIA PARA O SORTEIO
+           ========================================= */
+        .overlay-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+        }
+
+        .modal-content {
+            background: #16213e;
+            padding: 40px 60px;
+            border-radius: 20px;
+            text-align: center;
+            border: 5px solid #00f2fe;
+            box-shadow: 0 0 50px rgba(0, 242, 254, 0.6);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-title {
+            color: #e94560;
+            font-size: 3rem;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-number {
+            font-size: 10rem;
+            color: #4cd137;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(76, 209, 55, 0.5);
+            margin: 10px 0 30px 0;
+        }
+
+        .modal-logo {
+            max-width: 400px;
+            max-height: 200px;
+            border-radius: 12px;
+            background: white;
+            padding: 15px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        .modal-sponsor-name {
+            font-size: 2.5rem;
+            color: #fff;
+            margin: 0;
+        }
+
+        .modal-hint { color: #8fa0a6; margin-top: 25px; font-size: 1rem; }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="drawModal" class="overlay-modal" onclick="closeModal()">
+        <div class="modal-content">
+            <h2 id="modalTitle" class="modal-title">LETRA -</h2>
+            <div id="modalNumber" class="modal-number">--</div>
+            <img id="modalLogo" class="modal-logo" src="" alt="Patrocinador">
+            <p id="modalSponsorName" class="modal-sponsor-name">Nome do Patrocinador</p>
+            <p class="modal-hint">(Clique em qualquer lugar para continuar)</p>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="title-area">
+            <h1>BINGO INTERATIVO PRO</h1>
+            <p>Painel Geral com Patrocinadores e Letras Customizadas</p>
+        </div>
+        <button class="btn-reset" onclick="resetGame()">♻️ Nova Rodada (Zerar)</button>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <div>
+                <h2>Palavra do Jogo</h2>
+                <div class="word-selector">
+                    <button id="btnWordBingo" class="word-btn active" onclick="setWord('BINGO')">BINGO</button>
+                    <button id="btnWordAjude" class="word-btn" onclick="setWord('AJUDE')">AJUDE</button>
+                </div>
+
+                <h2>Modo de Sorteio</h2>
+                <div class="mode-selector">
+                    <button id="btnModeAuto" class="mode-btn active" onclick="setMode('auto')">Automático</button>
+                    <button id="btnModeManual" class="mode-btn" onclick="setMode('manual')">Manual (Globo)</button>
+                </div>
+
+                <h2>Última Pedra</h2>
+                <div class="big-number-container">
+                    <div class="big-letter" id="currentLetter">--</div>
+                    <div class="big-number" id="currentBall">--</div>
+                </div>
+                
+                <div class="current-sponsor-details">
+                    <img id="currentSponsorLogo" src="" alt="Logo Patrocinador">
+                    <div class="sponsor-alert" id="sponsorAlert">Aguardando início...</div>
+                </div>
+            </div>
+
+            <div class="action-area" id="actionArea">
+                <button class="btn-draw" onclick="drawAutomatic()">Sortear Número</button>
+            </div>
+        </div>
+
+        <div class="bingo-board" id="bingoBoard"></div>
+    </div>
+
+    <script src="patrocinadores.js"></script>
+
+    <script>
+        // === 1. CONFIGURAÇÃO BÁSICA ===
+        const defaultLogo = "patrocinadores/SuaLogo.jpg";
+        const sponsors = {};
+        for (let i = 1; i <= 75; i++) {
+            if (typeof sponsorConfig !== 'undefined' && sponsorConfig[i]) {
+                sponsors[i] = sponsorConfig[i];
+            } else {
+                sponsors[i] = { name: `Apoio Nº ${i}`, logo: defaultLogo };
+            }
+        }
+
+        const totalNumbers = 75;
+        let drawnNumbers = [];
+        let modalTimeout;
+        let currentWord = 'BINGO'; // Palavra padrão
+
+        // Lógica matemática para descobrir qual a letra de cada número (de 15 em 15)
+        function getLetterForNumber(num) {
+            const index = Math.ceil(num / 15) - 1;
+            return currentWord[index] || '';
+        }
+
+        // === 2. INICIALIZAR GRADE ===
+        const board = document.getElementById('bingoBoard');
+        for (let i = 1; i <= totalNumbers; i++) {
+            const ballDiv = document.createElement('div');
+            ballDiv.className = 'ball';
+            ballDiv.id = `ball-${i}`;
+            
+            ballDiv.onclick = function() {
+                if (drawnNumbers.includes(i)) showFullScreenModal(i);
+            };
+            
+            const logoImg = document.createElement('img');
+            logoImg.className = 'sponsor-grid-logo';
+            logoImg.src = sponsors[i].logo;
+
+            // NOVA PARTE: Exibir a letra pequena no quadrado
+            const letterSpan = document.createElement('span');
+            letterSpan.className = 'ball-letter';
+            letterSpan.id = `letter-span-${i}`;
+            letterSpan.innerText = getLetterForNumber(i);
+
+            const numSpan = document.createElement('span');
+            numSpan.className = 'ball-number';
+            numSpan.innerText = i;
+            
+            const sponsorSpan = document.createElement('span');
+            sponsorSpan.className = 'sponsor-name';
+            sponsorSpan.innerText = sponsors[i].name;
+
+            ballDiv.appendChild(logoImg);
+            ballDiv.appendChild(letterSpan);
+            ballDiv.appendChild(numSpan);
+            ballDiv.appendChild(sponsorSpan);
+            board.appendChild(ballDiv);
+        }
+
+        // === 3. ALTERNAR PALAVRA (BINGO / AJUDE) ===
+        function setWord(word) {
+            currentWord = word;
+            localStorage.setItem('bingoWordSave', word);
+
+            // Atualiza botões
+            if (word === 'BINGO') {
+                document.getElementById('btnWordBingo').classList.add('active');
+                document.getElementById('btnWordAjude').classList.remove('active');
+            } else {
+                document.getElementById('btnWordAjude').classList.add('active');
+                document.getElementById('btnWordBingo').classList.remove('active');
+            }
+
+            // Atualiza todas as letras da grade em tempo real
+            for (let i = 1; i <= totalNumbers; i++) {
+                document.getElementById(`letter-span-${i}`).innerText = getLetterForNumber(i);
+            }
+
+            // Atualiza o painel esquerdo se houver uma pedra lá
+            if (drawnNumbers.length > 0) {
+                const lastNum = drawnNumbers[drawnNumbers.length - 1];
+                document.getElementById('currentLetter').innerText = `LETRA ${getLetterForNumber(lastNum)}`;
+            }
+        }
+
+        // === 4. SALVAMENTO E CARREGAMENTO ===
+        function saveState() {
+            localStorage.setItem('bingoSave', JSON.stringify(drawnNumbers));
+        }
+
+        function loadState() {
+            // Carrega a palavra escolhida (BINGO ou AJUDE)
+            const savedWord = localStorage.getItem('bingoWordSave');
+            if (savedWord) setWord(savedWord);
+
+            // Carrega os números sorteados
+            const savedData = localStorage.getItem('bingoSave');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                if (parsedData.length > 0) {
+                    parsedData.forEach(num => {
+                        drawnNumbers.push(num);
+                        const activeBall = document.getElementById(`ball-${num}`);
+                        if (activeBall) activeBall.classList.add('drawn');
+                    });
+                    const lastDrawn = drawnNumbers[drawnNumbers.length - 1];
+                    updateLeftPanel(lastDrawn);
+                }
+            }
+        }
+
+        function resetGame() {
+            if (confirm('Tem certeza que deseja ZERAR o painel e começar uma nova rodada?')) {
+                localStorage.removeItem('bingoSave');
+                location.reload();
+            }
+        }
+
+        // === 5. CONTROLES DA TELA CHEIA (MODAL) ===
+        function showFullScreenModal(num) {
+            const sponsorData = sponsors[num];
+            const letter = getLetterForNumber(num);
+            
+            document.getElementById('modalTitle').innerText = `LETRA ${letter}`;
+            document.getElementById('modalNumber').innerText = num;
+            document.getElementById('modalLogo').src = sponsorData.logo;
+            document.getElementById('modalSponsorName').innerText = sponsorData.name;
+            
+            const modal = document.getElementById('drawModal');
+            modal.style.display = 'flex';
+
+            clearTimeout(modalTimeout);
+            modalTimeout = setTimeout(() => { closeModal(); }, 4000);
+        }
+
+        function closeModal() {
+            document.getElementById('drawModal').style.display = 'none';
+            const manualInput = document.getElementById('manualNum');
+            if(manualInput) manualInput.focus();
+        }
+
+        // === 6. ATUALIZAÇÃO DA INTERFACE ===
+        function setMode(mode) {
+            const btnAuto = document.getElementById('btnModeAuto');
+            const btnManual = document.getElementById('btnModeManual');
+            const actionArea = document.getElementById('actionArea');
+
+            if (mode === 'auto') {
+                btnAuto.classList.add('active');
+                btnManual.classList.remove('active');
+                actionArea.innerHTML = `<button class="btn-draw" onclick="drawAutomatic()">Sortear Número</button>`;
+            } else {
+                btnAuto.classList.remove('active');
+                btnManual.classList.add('active');
+                actionArea.innerHTML = `
+                    <div class="manual-input-container">
+                        <input type="number" id="manualNum" class="input-number" min="1" max="75" placeholder="Nº" onkeydown="if(event.key==='Enter') drawManual()">
+                        <button class="btn-insert" onclick="drawManual()">Marcar</button>
+                    </div>
+                `;
+                setTimeout(() => document.getElementById('manualNum').focus(), 50);
+            }
+        }
+
+        function updateLeftPanel(num) {
+            const sponsorData = sponsors[num];
+            const letter = getLetterForNumber(num);
+
+            document.getElementById('currentLetter').innerText = `LETRA ${letter}`;
+            document.getElementById('currentBall').innerText = num;
+            document.getElementById('sponsorAlert').innerText = `Patrocínio: ${sponsorData.name}`;
+            
+            const logoImgLeft = document.getElementById('currentSponsorLogo');
+            logoImgLeft.src = sponsorData.logo;
+            logoImgLeft.classList.add('active');
+        }
+
+        function markNumber(num) {
+            drawnNumbers.push(num); 
+            saveState(); 
+
+            updateLeftPanel(num);
+            const activeBall = document.getElementById(`ball-${num}`);
+            if (activeBall) activeBall.classList.add('drawn');
+
+            showFullScreenModal(num);
+        }
+
+        // === 7. LÓGICAS DE SORTEIO ===
+        function drawAutomatic() {
+            if (drawnNumbers.length === totalNumbers) {
+                alert('Todos os números já foram sorteados!');
+                return;
+            }
+
+            let numAleatorio;
+            do { numAleatorio = Math.floor(Math.random() * totalNumbers) + 1; } 
+            while (drawnNumbers.includes(numAleatorio));
+
+            markNumber(numAleatorio);
+        }
+
+        function drawManual() {
+            const input = document.getElementById('manualNum');
+            const num = parseInt(input.value);
+
+            if (isNaN(num) || num < 1 || num > totalNumbers) {
+                alert(`Por favor, insira um número válido entre 1 e ${totalNumbers}.`);
+                input.value = ''; input.focus(); return;
+            }
+
+            if (drawnNumbers.includes(num)) {
+                alert(`O número ${num} já foi marcado anteriormente!`);
+                input.value = ''; input.focus(); return;
+            }
+
+            markNumber(num);
+            input.value = ''; 
+        }
+
+        window.onload = loadState;
+
+    </script>
+</body>
+</html>
