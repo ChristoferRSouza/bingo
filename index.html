@@ -3,17 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Bingo com Letras Customizadas</title>
+    <title>Painel de Bingo com Temas e Cancelamento</title>
     <style>
+        /* === VARIÁVEIS DE TEMA ESCURO (Padrão) === */
+        :root {
+            --bg-body: #1a1a2e;
+            --bg-panel: #16213e;
+            --bg-element: #0f172a;
+            --text-main: #ffffff;
+            --text-muted: #8fa0a6;
+            --border-color: #4f5d75;
+            --accent-red: #e94560;
+            --accent-blue: #00f2fe;
+            --accent-green: #4cd137;
+            --ball-drawn-text: #000000;
+        }
+
+        /* === VARIÁVEIS DE TEMA CLARO (Dia) === */
+        body.light-theme {
+            --bg-body: #e4e6eb;
+            --bg-panel: #ffffff;
+            --bg-element: #f0f2f5;
+            --text-main: #1c1e21;
+            --text-muted: #606770;
+            --border-color: #ced4da;
+            --accent-red: #d63031;
+            --accent-blue: #0984e3;
+            --accent-green: #00b894;
+            --ball-drawn-text: #ffffff;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a2e;
-            color: #ffffff;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: all 0.3s ease;
         }
 
         .header {
@@ -25,8 +54,8 @@
             margin-bottom: 20px;
         }
 
-        .title-area h1 { color: #e94560; margin: 0; }
-        .title-area p { margin: 5px 0 0 0; color: #8fa0a6; }
+        .title-area h1 { color: var(--accent-red); margin: 0; transition: color 0.3s; }
+        .title-area p { margin: 5px 0 0 0; color: var(--text-muted); }
 
         .btn-reset {
             background-color: #ff4757;
@@ -51,29 +80,34 @@
         /* --- Painel de Controle (Esquerda) --- */
         .controls {
             flex: 1;
-            background: #16213e;
+            background: var(--bg-panel);
             padding: 20px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             min-width: 350px;
+            transition: background 0.3s;
         }
 
-        .mode-selector {
+        h2 { margin-top: 0; font-size: 1.2rem; }
+
+        .selector-group {
             display: flex;
-            background: #0f172a;
+            background: var(--bg-element);
             border-radius: 8px;
             padding: 5px;
             margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
         }
 
-        .mode-btn {
+        .toggle-btn {
             flex: 1;
             background: transparent;
-            color: #8fa0a6;
+            color: var(--text-muted);
             border: none;
             padding: 8px;
             cursor: pointer;
@@ -82,34 +116,15 @@
             font-size: 0.9rem;
             transition: 0.2s;
         }
-        .mode-btn.active { background: #e94560; color: white; }
-
-        .word-selector {
-            display: flex;
-            background: #0f172a;
-            border-radius: 8px;
-            padding: 5px;
-            margin-bottom: 15px;
-            border: 1px solid #4f5d75;
-        }
-
-        .word-btn {
-            flex: 1;
-            background: transparent;
-            color: #8fa0a6;
-            border: none;
-            padding: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .word-btn.active { background: #00f2fe; color: #000; }
+        
+        .toggle-btn.active.theme-btn { background: #f39c12; color: #fff; }
+        .toggle-btn.active.theme-btn-dark { background: #34495e; color: #fff; }
+        .toggle-btn.active.mode-btn { background: var(--accent-red); color: white; }
+        .toggle-btn.active.word-btn { background: var(--accent-blue); color: #fff; }
 
         .big-number-container {
-            background: #0f172a;
-            border: 2px solid #00f2fe;
+            background: var(--bg-element);
+            border: 2px solid var(--accent-blue);
             border-radius: 8px;
             margin: 10px 0;
             padding: 15px 5px;
@@ -118,19 +133,20 @@
             align-items: center;
             justify-content: center;
             height: 140px;
+            transition: all 0.3s;
         }
 
         .big-letter {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #e94560;
+            color: var(--accent-red);
             line-height: 1;
         }
 
         .big-number {
             font-size: 6rem;
             font-weight: bold;
-            color: #00f2fe;
+            color: var(--accent-blue);
             line-height: 1;
         }
 
@@ -153,11 +169,11 @@
             border: 2px solid transparent;
             display: none;
         }
-        #currentSponsorLogo.active { display: block; border-color: #e94560; }
+        #currentSponsorLogo.active { display: block; border-color: var(--accent-red); }
 
         .sponsor-alert {
             font-size: 1.3rem;
-            color: #4cd137;
+            color: var(--accent-green);
             font-weight: bold;
             margin: 0;
         }
@@ -170,8 +186,8 @@
         }
 
         .btn-draw {
-            background-color: #4cd137;
-            color: #000;
+            background-color: var(--accent-green);
+            color: #fff;
             border: none;
             padding: 15px 30px;
             font-size: 1.2rem;
@@ -180,35 +196,38 @@
             cursor: pointer;
             transition: 0.2s;
             width: 100%;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
-        .btn-draw:hover { background-color: #63ff47; }
+        .btn-draw:hover { filter: brightness(1.1); }
 
         .manual-input-container { display: flex; gap: 10px; width: 100%; }
 
         .input-number {
             flex: 1;
-            background: #0f172a;
-            border: 2px solid #4f5d75;
-            color: #fff;
+            background: var(--bg-element);
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
             border-radius: 8px;
             font-size: 1.5rem;
             text-align: center;
             font-weight: bold;
             outline: none;
+            transition: all 0.3s;
         }
-        .input-number:focus { border-color: #00f2fe; }
+        .input-number:focus { border-color: var(--accent-blue); }
 
         .btn-insert {
-            background-color: #00f2fe;
-            color: #000;
+            background-color: var(--accent-blue);
+            color: #fff;
             border: none;
             padding: 10px 20px;
             font-size: 1rem;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
-        .btn-insert:hover { background-color: #38f9ff; }
+        .btn-insert:hover { filter: brightness(1.1); }
 
         /* --- Painel Geral / Grade --- */
         .bingo-board {
@@ -216,15 +235,16 @@
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             gap: 8px;
-            background: #16213e;
+            background: var(--bg-panel);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: background 0.3s;
         }
 
         .ball {
-            background: #0f172a;
-            border: 1px solid #4f5d75;
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             aspect-ratio: 1;
             display: flex;
@@ -238,8 +258,8 @@
             user-select: none;
         }
 
-        .ball .ball-letter { font-size: 0.7rem; color: #00f2fe; z-index: 2; margin-bottom: -5px; }
-        .ball .ball-number { font-size: 1.3rem; z-index: 2; }
+        .ball .ball-letter { font-size: 0.7rem; color: var(--accent-blue); z-index: 2; margin-bottom: -5px; }
+        .ball .ball-number { font-size: 1.3rem; z-index: 2; color: var(--text-main); }
 
         .sponsor-grid-logo {
             max-width: 70%;
@@ -253,7 +273,7 @@
 
         .ball .sponsor-name {
             font-size: 0.5rem;
-            color: #8fa0a6;
+            color: var(--text-muted);
             text-align: center;
             max-width: 95%;
             white-space: nowrap;
@@ -264,28 +284,31 @@
 
         /* Estado após o sorteio */
         .ball.drawn {
-            background: #4cd137;
-            color: #000;
-            border-color: #fff;
+            background: var(--accent-green);
+            border-color: transparent;
             transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(76, 209, 55, 0.7);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             cursor: pointer;
         }
-        .ball.drawn:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(76, 209, 55, 1); }
+        .ball.drawn:hover { transform: scale(1.1); filter: brightness(1.1); }
         
         .ball.drawn .sponsor-grid-logo { opacity: 1; filter: grayscale(0%); background: rgba(255,255,255,0.8); padding: 2px; border-radius: 4px; }
-        .ball.drawn .sponsor-name { color: #000000; font-weight: 800; }
-        .ball.drawn .ball-letter { color: #e94560; font-weight: 900; }
+        .ball.drawn .sponsor-name { color: var(--ball-drawn-text); font-weight: 800; }
+        .ball.drawn .ball-letter { color: var(--ball-drawn-text); font-weight: 900; opacity: 0.8;}
+        .ball.drawn .ball-number { color: var(--ball-drawn-text); font-weight: 900; }
+
+        /* Dica de Cancelamento */
+        .hint-text { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 15px; width: 100%; }
 
         /* =========================================
-           MODAL DE TELA CHEIA PARA O SORTEIO
+           MODAL DE TELA CHEIA
            ========================================= */
         .overlay-modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.85);
             z-index: 9999;
             align-items: center;
             justify-content: center;
@@ -294,52 +317,23 @@
         }
 
         .modal-content {
-            background: #16213e;
+            background: var(--bg-panel);
             padding: 40px 60px;
             border-radius: 20px;
             text-align: center;
-            border: 5px solid #00f2fe;
-            box-shadow: 0 0 50px rgba(0, 242, 254, 0.6);
+            border: 5px solid var(--accent-blue);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .modal-title {
-            color: #e94560;
-            font-size: 3rem;
-            margin: 0 0 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .modal-number {
-            font-size: 10rem;
-            color: #4cd137;
-            font-weight: 900;
-            line-height: 1;
-            text-shadow: 0 0 20px rgba(76, 209, 55, 0.5);
-            margin: 10px 0 30px 0;
-        }
-
-        .modal-logo {
-            max-width: 400px;
-            max-height: 200px;
-            border-radius: 12px;
-            background: white;
-            padding: 15px;
-            object-fit: contain;
-            margin-bottom: 15px;
-        }
-
-        .modal-sponsor-name {
-            font-size: 2.5rem;
-            color: #fff;
-            margin: 0;
-        }
-
-        .modal-hint { color: #8fa0a6; margin-top: 25px; font-size: 1rem; }
+        .modal-title { color: var(--accent-red); font-size: 3rem; margin: 0 0 10px 0; letter-spacing: 2px; }
+        .modal-number { font-size: 10rem; color: var(--accent-green); font-weight: 900; line-height: 1; margin: 10px 0 30px 0; }
+        .modal-logo { max-width: 400px; max-height: 200px; border-radius: 12px; background: white; padding: 15px; object-fit: contain; margin-bottom: 15px; }
+        .modal-sponsor-name { font-size: 2.5rem; color: var(--text-main); margin: 0; }
+        .modal-hint { color: var(--text-muted); margin-top: 25px; font-size: 1rem; }
 
         @keyframes popIn {
             0% { transform: scale(0.5); opacity: 0; }
@@ -362,7 +356,7 @@
     <div class="header">
         <div class="title-area">
             <h1>BINGO INTERATIVO PRO</h1>
-            <p>Painel Geral com Patrocinadores e Letras Customizadas</p>
+            <p>Painel Geral com Patrocinadores</p>
         </div>
         <button class="btn-reset" onclick="resetGame()">♻️ Nova Rodada (Zerar)</button>
     </div>
@@ -370,16 +364,21 @@
     <div class="container">
         <div class="controls">
             <div>
+                <div class="selector-group">
+                    <button id="btnThemeDark" class="toggle-btn theme-btn-dark active" onclick="setTheme('dark')">🌙 Noite</button>
+                    <button id="btnThemeLight" class="toggle-btn theme-btn" onclick="setTheme('light')">☀️ Dia</button>
+                </div>
+
                 <h2>Palavra do Jogo</h2>
-                <div class="word-selector">
-                    <button id="btnWordBingo" class="word-btn active" onclick="setWord('BINGO')">BINGO</button>
-                    <button id="btnWordAjude" class="word-btn" onclick="setWord('AJUDE')">AJUDE</button>
+                <div class="selector-group">
+                    <button id="btnWordBingo" class="toggle-btn word-btn active" onclick="setWord('BINGO')">BINGO</button>
+                    <button id="btnWordAjude" class="toggle-btn word-btn" onclick="setWord('AJUDE')">AJUDE</button>
                 </div>
 
                 <h2>Modo de Sorteio</h2>
-                <div class="mode-selector">
-                    <button id="btnModeAuto" class="mode-btn active" onclick="setMode('auto')">Automático</button>
-                    <button id="btnModeManual" class="mode-btn" onclick="setMode('manual')">Manual (Globo)</button>
+                <div class="selector-group">
+                    <button id="btnModeAuto" class="toggle-btn mode-btn active" onclick="setMode('auto')">Automático</button>
+                    <button id="btnModeManual" class="toggle-btn mode-btn" onclick="setMode('manual')">Manual</button>
                 </div>
 
                 <h2>Última Pedra</h2>
@@ -399,7 +398,10 @@
             </div>
         </div>
 
-        <div class="bingo-board" id="bingoBoard"></div>
+        <div>
+            <div class="bingo-board" id="bingoBoard"></div>
+            <p class="hint-text">💡 <b>Dica:</b> Clique com o <b>botão direito</b> do mouse sobre uma pedra já sorteada para cancelar/remover o número.</p>
+        </div>
     </div>
 
     <script src="patrocinadores.js"></script>
@@ -419,30 +421,39 @@
         const totalNumbers = 75;
         let drawnNumbers = [];
         let modalTimeout;
-        let currentWord = 'BINGO'; // Palavra padrão
+        let currentWord = 'BINGO';
 
-        // Lógica matemática para descobrir qual a letra de cada número (de 15 em 15)
         function getLetterForNumber(num) {
             const index = Math.ceil(num / 15) - 1;
             return currentWord[index] || '';
         }
 
-        // === 2. INICIALIZAR GRADE ===
+        // === 2. INICIALIZAR GRADE E EVENTOS DE CLIQUE ===
         const board = document.getElementById('bingoBoard');
         for (let i = 1; i <= totalNumbers; i++) {
             const ballDiv = document.createElement('div');
             ballDiv.className = 'ball';
             ballDiv.id = `ball-${i}`;
             
+            // Clique Esquerdo: Abrir Modal
             ballDiv.onclick = function() {
                 if (drawnNumbers.includes(i)) showFullScreenModal(i);
             };
+
+            // Clique Direito: Remover Número (NOVA FUNÇÃO)
+            ballDiv.addEventListener('contextmenu', function(e) {
+                e.preventDefault(); // Impede de abrir o menu padrão do navegador
+                if (drawnNumbers.includes(i)) {
+                    if (confirm(`Atenção: Deseja CANCELAR o número ${i} e removê-lo dos sorteados?`)) {
+                        removeNumber(i);
+                    }
+                }
+            });
             
             const logoImg = document.createElement('img');
             logoImg.className = 'sponsor-grid-logo';
             logoImg.src = sponsors[i].logo;
 
-            // NOVA PARTE: Exibir a letra pequena no quadrado
             const letterSpan = document.createElement('span');
             letterSpan.className = 'ball-letter';
             letterSpan.id = `letter-span-${i}`;
@@ -463,12 +474,48 @@
             board.appendChild(ballDiv);
         }
 
-        // === 3. ALTERNAR PALAVRA (BINGO / AJUDE) ===
+        // === 3. FUNÇÃO DE REMOVER NÚMERO (CANCELAMENTO) ===
+        function removeNumber(num) {
+            // Remove o número da Array
+            drawnNumbers = drawnNumbers.filter(n => n !== num);
+            saveState(); // Atualiza o salvamento no navegador
+
+            // Remove o destaque visual da grade
+            const activeBall = document.getElementById(`ball-${num}`);
+            if (activeBall) activeBall.classList.remove('drawn');
+
+            // Atualiza o painel esquerdo para a última pedra válida
+            if (drawnNumbers.length > 0) {
+                const lastDrawn = drawnNumbers[drawnNumbers.length - 1];
+                updateLeftPanel(lastDrawn);
+            } else {
+                // Se apagou todas as pedras, reseta o painel esquerdo
+                document.getElementById('currentLetter').innerText = '--';
+                document.getElementById('currentBall').innerText = '--';
+                document.getElementById('sponsorAlert').innerText = 'Aguardando início...';
+                document.getElementById('currentSponsorLogo').classList.remove('active');
+            }
+        }
+
+        // === 4. ALTERNAR TEMA (CLARO / ESCURO) ===
+        function setTheme(theme) {
+            localStorage.setItem('bingoThemeSave', theme);
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                document.getElementById('btnThemeLight').classList.add('active');
+                document.getElementById('btnThemeDark').classList.remove('active');
+            } else {
+                document.body.classList.remove('light-theme');
+                document.getElementById('btnThemeDark').classList.add('active');
+                document.getElementById('btnThemeLight').classList.remove('active');
+            }
+        }
+
+        // === 5. ALTERNAR PALAVRA (BINGO / AJUDE) ===
         function setWord(word) {
             currentWord = word;
             localStorage.setItem('bingoWordSave', word);
 
-            // Atualiza botões
             if (word === 'BINGO') {
                 document.getElementById('btnWordBingo').classList.add('active');
                 document.getElementById('btnWordAjude').classList.remove('active');
@@ -477,29 +524,31 @@
                 document.getElementById('btnWordBingo').classList.remove('active');
             }
 
-            // Atualiza todas as letras da grade em tempo real
             for (let i = 1; i <= totalNumbers; i++) {
                 document.getElementById(`letter-span-${i}`).innerText = getLetterForNumber(i);
             }
 
-            // Atualiza o painel esquerdo se houver uma pedra lá
             if (drawnNumbers.length > 0) {
                 const lastNum = drawnNumbers[drawnNumbers.length - 1];
                 document.getElementById('currentLetter').innerText = `LETRA ${getLetterForNumber(lastNum)}`;
             }
         }
 
-        // === 4. SALVAMENTO E CARREGAMENTO ===
+        // === 6. SALVAMENTO E CARREGAMENTO ===
         function saveState() {
             localStorage.setItem('bingoSave', JSON.stringify(drawnNumbers));
         }
 
         function loadState() {
-            // Carrega a palavra escolhida (BINGO ou AJUDE)
+            // Carrega Tema
+            const savedTheme = localStorage.getItem('bingoThemeSave');
+            if (savedTheme) setTheme(savedTheme);
+
+            // Carrega Palavra
             const savedWord = localStorage.getItem('bingoWordSave');
             if (savedWord) setWord(savedWord);
 
-            // Carrega os números sorteados
+            // Carrega Números
             const savedData = localStorage.getItem('bingoSave');
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
@@ -522,7 +571,7 @@
             }
         }
 
-        // === 5. CONTROLES DA TELA CHEIA (MODAL) ===
+        // === 7. CONTROLES DA TELA CHEIA (MODAL) ===
         function showFullScreenModal(num) {
             const sponsorData = sponsors[num];
             const letter = getLetterForNumber(num);
@@ -545,7 +594,7 @@
             if(manualInput) manualInput.focus();
         }
 
-        // === 6. ATUALIZAÇÃO DA INTERFACE ===
+        // === 8. ATUALIZAÇÃO DA INTERFACE ===
         function setMode(mode) {
             const btnAuto = document.getElementById('btnModeAuto');
             const btnManual = document.getElementById('btnModeManual');
@@ -592,7 +641,7 @@
             showFullScreenModal(num);
         }
 
-        // === 7. LÓGICAS DE SORTEIO ===
+        // === 9. LÓGICAS DE SORTEIO ===
         function drawAutomatic() {
             if (drawnNumbers.length === totalNumbers) {
                 alert('Todos os números já foram sorteados!');
